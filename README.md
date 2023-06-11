@@ -2,6 +2,8 @@
 
 This application is a simple bot control UI built with React.js. It offers an interface to control and configure a bot that interacts with `kick.com`.
 
+![preview](https://prnt.sc/v6YiJF5Z9j0m)
+
 ## Installation
 
 Before running the application, make sure you have [Node.js](https://nodejs.org/) installed.

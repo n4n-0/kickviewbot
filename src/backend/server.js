@@ -1,6 +1,6 @@
 import express from 'express';
 import cors from 'cors';
-import { StartBot, StopAllBrowsers, IsRunning } from './bot.js';
+import { startBot, stopAllBrowsers, isRunning } from './bot.js';
 
 const app = express();
 const port = 3000;
@@ -20,7 +20,7 @@ app.post('/start', async (req, res) => {
     const { url, numOfBrowsers, headless } = req.body;
 
     try {
-        await StartBot(url, numOfBrowsers, headless);
+        await startBot(url, numOfBrowsers, headless);
         res.send(`Bot started successfully! ${numOfBrowsers} browsers are running in ${headless ? 'headless' : 'non-headless'} mode.`);
     } catch (error) {
         res.status(500).send(`Failed to start bot: ${error.message}`);
@@ -29,7 +29,7 @@ app.post('/start', async (req, res) => {
 
 app.post('/stop', async (req, res) => {
     try {
-        await StopAllBrowsers();
+        await stopAllBrowsers();
         res.send('All browsers stopped successfully!');
     } catch (error) {
         res.status(500).send(`Failed to stop browsers: ${error.message}`);
@@ -38,15 +38,15 @@ app.post('/stop', async (req, res) => {
 
 app.post('/update', async (req, res) => {
     const { url, numOfBrowsers, headless } = req.body;
-    const running = IsRunning();
+    const running = isRunning();
 
     try {
         // Stop all browsers
-        await StopAllBrowsers();
+        await stopAllBrowsers();
 
         // Start the bot with the new settings
         if (running) {
-            await StartBot(url, numOfBrowsers, headless);
+            await startBot(url, numOfBrowsers, headless);
         }
 
         res.send('Bot settings updated successfully!');
@@ -56,5 +56,5 @@ app.post('/update', async (req, res) => {
 });
 
 app.get('/status', (req, res) => {
-    res.send({ running: IsRunning() });
+    res.send({ running: isRunning() });
 });

@@ -36,6 +36,7 @@ function App() {
     headless: true
   });
   const [botRunning, setBotRunning] = useState(null);
+  const [buttonState, setButtonState] = useState('idle');
 
   useEffect(() => {
     (async () => {
@@ -68,15 +69,44 @@ function App() {
   };
 
   const updateSettings = async () => {
-    await apiRequest('/update', config);
-  }
+    try {
+      await apiRequest('/update', config);
+      toast('🚀 Settings Updated', TOAST_SETTINGS);
+    } catch (error) {
+      toast('❌ Error updating settings', TOAST_SETTINGS);
+      console.error(error);
+    }
+  };
 
   const startStopBot = async () => {
-    const endpoint = botRunning ? '/stop' : '/start';
-    const data = botRunning ? {} : config;
-    await apiRequest(endpoint, data);
-    setBotRunning(!botRunning);
-  }
+    if (!botRunning) {
+      if (!isValidUrl(config.url)) {
+        toast("❌ Invalid URL. Ensure it is not empty and contains 'kick.com'", TOAST_SETTINGS);
+        return;
+      }
+
+      setButtonState('starting');
+      try {
+        await apiRequest('/start', config);
+        setBotRunning(true);
+        setButtonState('running');
+      } catch (error) {
+        toast('❌ Error starting bot', TOAST_SETTINGS);
+        console.error(error);
+        setButtonState('idle');
+      }
+    } else {
+      setButtonState('idle');
+      try {
+        await apiRequest('/stop');
+        setBotRunning(false);
+      } catch (error) {
+        toast('❌ Error stopping bot', TOAST_SETTINGS);
+        console.error(error);
+        setButtonState('running');
+      }
+    }
+  };
 
   return (
     <div className="App">
@@ -97,8 +127,13 @@ function App() {
         </div>
         <div name="button-area">
           <button type="button" onClick={updateSettings}>Update Settings</button>
-          <button type="button" onClick={startStopBot}>
-            {botRunning ? 'Stop Bot' : 'Start Bot'}
+          <button
+            type="button"
+            onClick={startStopBot}
+            disabled={buttonState === 'starting'}
+            className={buttonState === 'starting' ? 'yellow' : buttonState === 'running' ? 'red' : ''}
+          >
+            {buttonState === 'starting' ? 'Starting...' : botRunning ? 'Stop Bot' : 'Start Bot'}
           </button>
         </div>
       </form>
