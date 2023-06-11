@@ -25,7 +25,7 @@ Before running the application, make sure you have [Node.js](https://nodejs.org/
 
 To start the application, run the following command in the project directory:
 
-`npm start`
+`npm server` then `npm start`
 
 The application will be accessible at `http://localhost:3000`.
 
